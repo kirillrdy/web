@@ -1,9 +1,9 @@
 package html
 
 import (
-	"bytes"
 	golang_html "html"
 	"io"
+	"strings"
 )
 
 type Node struct {
@@ -14,8 +14,9 @@ type Node struct {
 	headTagMetaMagic string // This is for html doctype
 }
 
-func (node Node) attributesAsString() string {
-	var result bytes.Buffer
+//TODO pass buffer for even faster writing
+func (node Node) attributesAsString(result *strings.Builder) {
+	//TODO test this theory
 	for i := range node.Attributes {
 		//Note this is done for performance
 		result.WriteString(" ")
@@ -24,7 +25,6 @@ func (node Node) attributesAsString() string {
 		result.WriteString(node.Attributes[i].Value)
 		result.WriteString("\"")
 	}
-	return result.String()
 }
 
 func (node Node) WriteTo(writer io.Writer) (int64, error) {
@@ -34,12 +34,12 @@ func (node Node) WriteTo(writer io.Writer) (int64, error) {
 }
 
 func (node Node) String() string {
-	buffer := &bytes.Buffer{}
-	node.writeToBuffer(buffer)
-	return buffer.String()
+	var builder strings.Builder
+	node.writeToBuffer(&builder)
+	return builder.String()
 }
 
-func (node Node) writeToBuffer(buffer *bytes.Buffer) {
+func (node Node) writeToBuffer(buffer *strings.Builder) {
 
 	//TODO peformance bench this 'if' vs 'if len' vs no if
 	if node.headTagMetaMagic != "" {
@@ -47,7 +47,7 @@ func (node Node) writeToBuffer(buffer *bytes.Buffer) {
 	}
 	buffer.WriteString("<")
 	buffer.WriteString(node.nodeType)
-	buffer.WriteString(node.attributesAsString())
+	node.attributesAsString(buffer)
 	buffer.WriteString(">")
 
 	if len(node.children) > 0 {
