@@ -7,11 +7,10 @@ import (
 )
 
 type Node struct {
-	nodeType         string
-	Attributes       []Attribute
-	children         []Node
-	text             string
-	headTagMetaMagic string // This is for html doctype
+	nodeType   string
+	Attributes []Attribute
+	children   []Node
+	text       string
 }
 
 //TODO pass buffer for even faster writing
@@ -43,9 +42,15 @@ func (node Node) String() string {
 func (node Node) writeToBuffer(buffer *strings.Builder) {
 
 	//TODO peformance bench this 'if' vs 'if len' vs no if
-	if node.headTagMetaMagic != "" {
-		buffer.WriteString(node.headTagMetaMagic)
+	if node.nodeType == "html" {
+		buffer.WriteString("<!DOCTYPE html>")
 	}
+
+	if node.nodeType == "" {
+		buffer.WriteString(node.text)
+		return
+	}
+
 	buffer.WriteString("<")
 	buffer.WriteString(node.nodeType)
 	node.attributesAsString(buffer)
@@ -63,6 +68,10 @@ func (node Node) writeToBuffer(buffer *strings.Builder) {
 	buffer.WriteString(node.nodeType)
 	buffer.WriteString(">")
 
+}
+
+func Text(text string) Node {
+	return Node{text: golang_html.EscapeString(text)}
 }
 
 // Text will excape any input as html

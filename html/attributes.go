@@ -2,32 +2,20 @@ package html
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/kirillrdy/web"
-	"github.com/sparkymat/webdsl/css"
 )
 
-func (node Node) Src(value string) Node {
-	return node.Attribute("src", value)
-}
-
-func (node Node) Style(value string) Node {
-	return node.Attribute("style", value)
-}
-
-func (node Node) Id(id css.Id) Node {
-	return node.Attribute("id", string(id))
-}
-
-func (node Node) Class(values ...css.Class) Node {
-	var valuesForJoin []string
-	for _, value := range values {
-		valuesForJoin = append(valuesForJoin, string(value))
+func makeAttribute(name string) func(string) Attribute {
+	return func(value string) Attribute {
+		return Attribute{Name: name, Value: value}
 	}
-	attrValue := strings.Join(valuesForJoin, " ")
-	return node.Attribute("class", attrValue)
 }
+
+var Src = makeAttribute("src")
+var Id = makeAttribute("id")
+var Class = makeAttribute("class")
+var Charset = makeAttribute("charset")
 
 func (node Node) Type(value string) Node {
 	return node.Attribute("type", value)
