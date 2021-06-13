@@ -27,9 +27,7 @@ func (node Node) attributesAsString(result *strings.Builder) {
 }
 
 func (node Node) WriteTo(writer io.Writer) (int64, error) {
-	content := node.String()
-	//TODO mabe io.Copy would be faster ?
-	written, err := io.WriteString(writer, content)
+	written, err := io.WriteString(writer, node.String())
 	return int64(written), err
 }
 
