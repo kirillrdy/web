@@ -71,7 +71,7 @@ func (row Row) GetString(column Column) string {
 
 func (query Query) Execute() []Row {
 	var builder strings.Builder
-	builder.WriteString("select ")
+	builder.WriteString("SELECT ")
 	for i, column := range query.selectColumns {
 		if i == len(query.selectColumns)-1 {
 			builder.WriteString(column.fullName())
@@ -79,11 +79,11 @@ func (query Query) Execute() []Row {
 			builder.WriteString(column.fullName() + ",")
 		}
 	}
-	builder.WriteString(" from ")
+	builder.WriteString(" FROM ")
 	builder.WriteString(string(query.fromTable))
 
 	for _, join := range query.joins {
-		builder.WriteString(fmt.Sprintf(" join %s on %s = %s ", join.table, join.leftColumn.fullName(), join.rightColumn.fullName()))
+		builder.WriteString(fmt.Sprintf(" JOIN %s ON %s = %s ", join.table, join.leftColumn.fullName(), join.rightColumn.fullName()))
 	}
 
 	// Default limit
@@ -92,8 +92,8 @@ func (query Query) Execute() []Row {
 		limit = *query.limit
 	}
 
-	builder.WriteString(fmt.Sprintf(" limit %d", limit))
-	log.Printf("%s", builder.String())
+	builder.WriteString(fmt.Sprintf(" LIMIT %d", limit))
+	log.Printf("QUERY: %s", builder.String())
 
 	rows, err := DB.Query(builder.String())
 	check(err)
