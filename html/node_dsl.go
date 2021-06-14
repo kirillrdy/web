@@ -1,9 +1,21 @@
 package html
 
+import (
+	"github.com/kirillrdy/web/db"
+)
+
 type ifWrapper struct {
 	condition bool
 	thenNodes []Node
 	elseNodes []Node
+}
+
+func Repeat(rows []db.Row, render func(db.Row) Node) []Node {
+	var result []Node
+	for _, row := range rows {
+		result = append(result, render(row))
+	}
+	return result
 }
 
 func If(condition bool) ifWrapper {
