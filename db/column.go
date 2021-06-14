@@ -7,9 +7,8 @@ import (
 
 type Table string
 type Column struct {
-	Name        string
-	Table       Table
-	DisplayName string
+	Name  string
+	Table Table
 }
 
 func (column Column) fullName() string {
@@ -22,8 +21,4 @@ func (column Column) fullName() string {
 
 func (table Table) Column(name string) Column {
 	return Column{Name: name, Table: table}
-}
-
-func (table Table) ColumnWithDisplayName(name string, displayName string) Column {
-	return Column{Name: name, Table: table, DisplayName: displayName}
 }
