@@ -57,7 +57,11 @@ type Row struct {
 }
 
 func (row Row) String(column Column) string {
-	return fmt.Sprintf("%v", row.values[row.columnOrder[column]])
+	order, ok := row.columnOrder[column]
+	if !ok {
+		log.Printf("WARNING: column not found in maping %v", column)
+	}
+	return fmt.Sprintf("%v", row.values[order])
 }
 
 func (row Row) GetString(column Column) string {
