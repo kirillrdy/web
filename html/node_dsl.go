@@ -16,7 +16,7 @@ func (wrapper ifWrapper) Then(nodes ...Node) ifWrapper {
 }
 
 func (wrapper ifWrapper) Else(nodes ...Node) ifWrapper {
-	wrapper.thenNodes = nodes
+	wrapper.elseNodes = nodes
 	return wrapper
 }
 
