@@ -64,6 +64,15 @@ func (row Row) String(column Column) string {
 	return fmt.Sprintf("%v", row.values[order])
 }
 
+func (row Row) GetInt64(column Column) int64 {
+	index := row.columnOrder[column]
+	value, ok := row.values[index].(int64)
+	if !ok {
+		log.Printf("WARNING: %s is not an int but %T", column.fullName(), row.values[index])
+	}
+	return value
+}
+
 func (row Row) GetString(column Column) string {
 	index := row.columnOrder[column]
 	value, ok := row.values[index].(string)
