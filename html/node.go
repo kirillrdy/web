@@ -72,6 +72,10 @@ func Text(text string) Node {
 	return Node{text: golang_html.EscapeString(text)}
 }
 
+func TextUnsafe(text string) Node {
+	return Node{text: text}
+}
+
 // Text will excape any input as html
 func (node Node) Text(text string) Node {
 	node.text = golang_html.EscapeString(text)
