@@ -65,7 +65,12 @@ func (row Row) String(column Column) string {
 }
 
 func (row Row) GetInt64(column Column) int64 {
-	index := row.columnOrder[column]
+
+	index, ok := row.columnOrder[column]
+	if !ok {
+		log.Printf("WARNING: %v is not found in %v", column, row.columnOrder)
+	}
+
 	value, ok := row.values[index].(int64)
 	if !ok {
 		log.Printf("WARNING: %s is not an int but %T", column.fullName(), row.values[index])
