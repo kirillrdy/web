@@ -2,8 +2,6 @@ package html
 
 import (
 	"fmt"
-
-	"github.com/kirillrdy/web"
 )
 
 func makeAttribute(name string) func(string) Attribute {
@@ -16,6 +14,7 @@ var Src = makeAttribute("src")
 var Id = makeAttribute("id")
 var Class = makeAttribute("class")
 var Charset = makeAttribute("charset")
+var Href = makeAttribute("href")
 
 func (node Node) Type(value string) Node {
 	return node.Attribute("type", value)
@@ -23,10 +22,6 @@ func (node Node) Type(value string) Node {
 
 func (node Node) Value(value string) Node {
 	return node.Attribute("value", value)
-}
-
-func (node Node) Href(value web.Path) Node {
-	return node.Attribute("href", string(value))
 }
 
 func (node Node) Media(value string) Node {
