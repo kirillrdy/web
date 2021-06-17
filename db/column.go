@@ -7,8 +7,8 @@ import (
 
 type Table string
 type Column struct {
-	Name  string
 	Table Table
+	Name  string
 }
 
 func (column Column) fullName() string {
