@@ -60,6 +60,7 @@ type Row struct {
 func (row Row) String(column Column) string {
 	value := row.GetValue(column)
 	if value, ok := value.(time.Time); ok {
+		//TODO i guess this really needs to be user timezone not server Local
 		return value.Local().Format(time.RFC822)
 	}
 	return fmt.Sprintf("%v", value)
