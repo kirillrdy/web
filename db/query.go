@@ -58,33 +58,33 @@ type Row struct {
 }
 
 func (row Row) String(column Column) string {
-	order, ok := row.columnOrder[column]
-	if !ok {
-		log.Printf("WARNING: column not found in maping %v", column)
-	}
-	if value, ok := row.values[order].(time.Time); ok {
+	value := row.GetValue(column)
+	if value, ok := value.(time.Time); ok {
 		return value.Local().Format(time.RFC822)
 	}
-	return fmt.Sprintf("%v", row.values[order])
+	return fmt.Sprintf("%v", value)
 }
 
-func (row Row) GetInt64(column Column) int64 {
-
+// These are designed to be used in the views, so they dont panic, or return errors
+func (row Row) GetValue(column Column) interface{} {
 	index, ok := row.columnOrder[column]
 	if !ok {
 		log.Printf("WARNING: %v is not found in %v", column, row.columnOrder)
 	}
+	return row.values[index]
+}
 
-	value, ok := row.values[index].(int64)
+func (row Row) GetInt64(column Column) int64 {
+	interfaceValue := row.GetValue(column)
+	value, ok := interfaceValue.(int64)
 	if !ok {
-		log.Printf("WARNING: %s is not an int but %T", column.fullName(), row.values[index])
+		log.Printf("WARNING: %s is not an int but %T", column.fullName(), interfaceValue)
 	}
 	return value
 }
 
 func (row Row) GetString(column Column) string {
-	index := row.columnOrder[column]
-	value, ok := row.values[index].(string)
+	value, ok := row.GetValue(column).(string)
 	if !ok {
 		log.Printf("WARNING: %s is not a string", column.fullName())
 	}
