@@ -6,6 +6,7 @@ import (
 	"log"
 	"reflect"
 	"strings"
+	"time"
 )
 
 var DB *sql.DB
@@ -60,6 +61,9 @@ func (row Row) String(column Column) string {
 	order, ok := row.columnOrder[column]
 	if !ok {
 		log.Printf("WARNING: column not found in maping %v", column)
+	}
+	if value, ok := row.values[order].(time.Time); ok {
+		return value.Local().Format(time.RFC822)
 	}
 	return fmt.Sprintf("%v", row.values[order])
 }
