@@ -15,6 +15,7 @@ var Id = makeAttribute("id")
 var Class = makeAttribute("class")
 var Charset = makeAttribute("charset")
 var Href = makeAttribute("href")
+var Value = makeAttribute("value")
 
 func (node Node) Type(value string) Node {
 	return node.Attribute("type", value)
