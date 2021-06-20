@@ -22,3 +22,7 @@ func (column Column) fullName() string {
 func (table Table) Column(name string) Column {
 	return Column{Name: name, Table: table}
 }
+
+func (column Column) Eq(value interface{}) WhereCondition {
+	return WhereCondition{fragment: column.fullName() + " = ", arg: value}
+}

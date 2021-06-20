@@ -11,6 +11,11 @@ import (
 
 var DB *sql.DB
 
+type WhereCondition struct {
+	fragment string
+	arg      interface{}
+}
+
 type Query struct {
 	selectColumns []Column
 	fromTable     Table
@@ -19,7 +24,8 @@ type Query struct {
 		leftColumn  Column
 		rightColumn Column
 	}
-	limit *int
+	whereConditions []WhereCondition
+	limit           *int
 }
 
 func (query Query) Join(table Table, leftColumn, rightColumn Column) Query {
@@ -28,6 +34,11 @@ func (query Query) Join(table Table, leftColumn, rightColumn Column) Query {
 		leftColumn  Column
 		rightColumn Column
 	}{table: table, leftColumn: leftColumn, rightColumn: rightColumn})
+	return query
+}
+
+func (query Query) Where(condition WhereCondition) Query {
+	query.whereConditions = append(query.whereConditions, condition)
 	return query
 }
 
@@ -92,6 +103,15 @@ func (row Row) GetString(column Column) string {
 	return value
 }
 
+func (query Query) ExecuteOne() (Row, error) {
+	rows := query.Limit(1).Execute()
+	if len(rows) == 0 {
+		//TODO better errors and use conctant errors
+		return Row{}, fmt.Errorf("didnt find anything")
+	}
+	return rows[0], nil
+}
+
 func (query Query) Execute() []Row {
 	var builder strings.Builder
 	builder.WriteString("SELECT ")
@@ -109,6 +129,19 @@ func (query Query) Execute() []Row {
 		builder.WriteString(fmt.Sprintf(" JOIN %s ON %s = %s ", join.table, join.leftColumn.fullName(), join.rightColumn.fullName()))
 	}
 
+	if len(query.whereConditions) != 0 {
+		builder.WriteString(" WHERE ")
+	}
+	var args []interface{}
+	for index, condition := range query.whereConditions {
+		if index == len(query.whereConditions)-1 {
+			builder.WriteString(condition.fragment + fmt.Sprintf(" $%d ", index+1))
+		} else {
+			builder.WriteString(condition.fragment + fmt.Sprintf(" $%d AND ", index+1))
+		}
+		args = append(args, condition.arg)
+	}
+
 	// Default limit
 	limit := 10
 	if query.limit != nil {
@@ -118,7 +151,7 @@ func (query Query) Execute() []Row {
 	builder.WriteString(fmt.Sprintf(" LIMIT %d", limit))
 	log.Printf("QUERY: %s", builder.String())
 
-	rows, err := DB.Query(builder.String())
+	rows, err := DB.Query(builder.String(), args...)
 	check(err)
 
 	defer rows.Close()
