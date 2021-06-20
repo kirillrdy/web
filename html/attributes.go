@@ -16,14 +16,10 @@ var Class = makeAttribute("class")
 var Charset = makeAttribute("charset")
 var Href = makeAttribute("href")
 var Value = makeAttribute("value")
-
-func (node Node) Type(value string) Node {
-	return node.Attribute("type", value)
-}
-
-func (node Node) Value(value string) Node {
-	return node.Attribute("value", value)
-}
+var Name = makeAttribute("name")
+var Type = makeAttribute("type")
+var Action = makeAttribute("action")
+var Method = makeAttribute("method")
 
 func (node Node) Media(value string) Node {
 	return node.Attribute("media", value)
@@ -31,10 +27,6 @@ func (node Node) Media(value string) Node {
 
 func (node Node) Rel(value string) Node {
 	return node.Attribute("rel", value)
-}
-
-func (node Node) Name(value string) Node {
-	return node.Attribute("name", value)
 }
 
 func (node Node) Content(value string) Node {
@@ -55,10 +47,6 @@ func (node Node) Selected(value string) Node {
 
 func (node Node) Align(value string) Node {
 	return node.Attribute("align", value)
-}
-
-func (node Node) Action(value string) Node {
-	return node.Attribute("action", value)
 }
 
 func (node Node) Placeholder(value string) Node {
