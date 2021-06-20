@@ -90,7 +90,7 @@ func (row Row) GetInt64(column Column) int64 {
 	interfaceValue := row.GetValue(column)
 	value, ok := interfaceValue.(int64)
 	if !ok {
-		log.Printf("WARNING: %s is not an int but %T", column.fullName(), interfaceValue)
+		log.Printf("WARNING: %s is not an int but %T", column.FullName(), interfaceValue)
 	}
 	return value
 }
@@ -98,7 +98,7 @@ func (row Row) GetInt64(column Column) int64 {
 func (row Row) GetString(column Column) string {
 	value, ok := row.GetValue(column).(string)
 	if !ok {
-		log.Printf("WARNING: %s is not a string", column.fullName())
+		log.Printf("WARNING: %s is not a string", column.FullName())
 	}
 	return value
 }
@@ -117,16 +117,16 @@ func (query Query) Execute() []Row {
 	builder.WriteString("SELECT ")
 	for i, column := range query.selectColumns {
 		if i == len(query.selectColumns)-1 {
-			builder.WriteString(column.fullName())
+			builder.WriteString(column.FullName())
 		} else {
-			builder.WriteString(column.fullName() + ",")
+			builder.WriteString(column.FullName() + ",")
 		}
 	}
 	builder.WriteString(" FROM ")
 	builder.WriteString(string(query.fromTable))
 
 	for _, join := range query.joins {
-		builder.WriteString(fmt.Sprintf(" JOIN %s ON %s = %s ", join.table, join.leftColumn.fullName(), join.rightColumn.fullName()))
+		builder.WriteString(fmt.Sprintf(" JOIN %s ON %s = %s ", join.table, join.leftColumn.FullName(), join.rightColumn.FullName()))
 	}
 
 	if len(query.whereConditions) != 0 {

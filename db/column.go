@@ -11,12 +11,12 @@ type Column struct {
 	Name  string
 }
 
-func (column Column) fullName() string {
+func (column Column) FullName() string {
 	//TODO for now hack here is easier
 	if strings.HasPrefix(column.Name, "st_astext") {
 		return column.Name
 	}
-	return fmt.Sprintf("\"%s\".\"%s\"", column.Table, column.Name)
+	return fmt.Sprintf("%s.%s", column.Table, column.Name)
 }
 
 func (table Table) Column(name string) Column {
@@ -24,5 +24,5 @@ func (table Table) Column(name string) Column {
 }
 
 func (column Column) Eq(value interface{}) WhereCondition {
-	return WhereCondition{fragment: column.fullName() + " = ", arg: value}
+	return WhereCondition{fragment: column.FullName() + " = ", arg: value}
 }
