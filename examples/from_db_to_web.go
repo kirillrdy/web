@@ -32,7 +32,7 @@ func main() {
 	for _, row := range rows {
 		Div(Class("foo"))(
 			P()(
-				Text(row.GetString(posts.title)),
+				Text(row.String(posts.title)),
 			),
 		)
 	}
