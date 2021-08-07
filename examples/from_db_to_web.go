@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"os/exec"
 
 	"github.com/kirillrdy/web/db"
@@ -40,16 +41,25 @@ func crash(err error) {
 }
 
 func main() {
-	server := postgresql.Server{DBDir: "my_db"}
-	server.InitDB()
+	dbDir := "example_db"
+	dbName := "movies"
+	server := postgresql.Server{DBDir: dbDir}
+	if _, err := os.Stat(dbDir); os.IsNotExist(err) == true {
+		server.InitDB()
+		server.Start()
+
+		crash(server.CreateDB(dbName))
+		crash(exec.Command("psql", "-d", dbName, "-f", "schema.sql").Run())
+		server.Stop()
+	}
+
 	server.Start()
 	defer server.Stop()
-	dbName := "movies"
-	crash(server.CreateDB(dbName))
-	crash(exec.Command("psql", "-d", dbName, "-f", "schema.sql").Run())
 
 	connection, err := server.Connect(dbName)
 	crash(err)
+
+	db.Insert().Into(tables.movies, movies.title).Values("Shawshank Redeption").Execute(connection)
 
 	rows := db.Select(movies.title).From(tables.movies).Execute(connection)
 	for _, row := range rows {
