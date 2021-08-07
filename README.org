@@ -1,0 +1,14 @@
+* Queries
+** column types
+*** money
+*** binary
+*** dates, times
+*** boolean
+*** enums
+*** JSON
+*** arrays
+
+* html dls
+* form building
+* search
+* pagination
