@@ -1,6 +1,7 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"strings"
@@ -32,7 +33,7 @@ func (query UpdateQuery) Set(column Column, value interface{}) UpdateQuery {
 	return query
 }
 
-func (query UpdateQuery) Execute() error {
+func (query UpdateQuery) Execute(db *sql.DB) error {
 	var builder strings.Builder
 	builder.WriteString("UPDATE ")
 	builder.WriteString(string(query.table))
@@ -57,7 +58,7 @@ func (query UpdateQuery) Execute() error {
 	builder.WriteString(fmt.Sprintf("$%d", len(query.values)+1))
 
 	log.Print(builder.String())
-	result, err := DB.Exec(builder.String(), args...)
+	result, err := db.Exec(builder.String(), args...)
 
 	if err != nil {
 		return err

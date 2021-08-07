@@ -8,8 +8,6 @@ import (
 	"strings"
 )
 
-var DB *sql.DB
-
 type WhereCondition struct {
 	fragment string
 	arg      interface{}
@@ -62,8 +60,8 @@ func check(err error) {
 	}
 }
 
-func (query Query) ExecuteOne() (Row, error) {
-	rows := query.Limit(1).Execute()
+func (query Query) ExecuteOne(db *sql.DB) (Row, error) {
+	rows := query.Limit(1).Execute(db)
 	if len(rows) == 0 {
 		//TODO better errors and use conctant errors
 		return Row{}, fmt.Errorf("didnt find anything")
@@ -71,7 +69,7 @@ func (query Query) ExecuteOne() (Row, error) {
 	return rows[0], nil
 }
 
-func (query Query) Execute() []Row {
+func (query Query) Execute(db *sql.DB) []Row {
 	var builder strings.Builder
 	builder.WriteString("SELECT ")
 	for i, column := range query.selectColumns {
@@ -110,7 +108,7 @@ func (query Query) Execute() []Row {
 	builder.WriteString(fmt.Sprintf(" LIMIT %d", limit))
 	log.Printf("QUERY: %s", builder.String())
 
-	rows, err := DB.Query(builder.String(), args...)
+	rows, err := db.Query(builder.String(), args...)
 	check(err)
 
 	defer rows.Close()
