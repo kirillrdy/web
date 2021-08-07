@@ -1,31 +1,42 @@
 package main
 
 import (
+	"log"
+	"os/exec"
+
 	"github.com/kirillrdy/web/db"
-	. "github.com/kirillrdy/web/html"
 	"github.com/kirillrdy/web/postgresql"
+	_ "github.com/lib/pq"
 )
 
 var tables = struct {
-	users db.Table
-	posts db.Table
+	people db.Table
+	movies db.Table
 }{
-	"users",
-	"posts",
+	"people",
+	"movies",
 }
-var users = struct {
-	id   db.Column
-	name db.Column
+var people = struct {
+	id         db.Column
+	first_name db.Column
+	last_name  db.Column
 }{
-	tables.users.Column("id"),
-	tables.users.Column("name"),
+	tables.people.Column("id"),
+	tables.people.Column("first_name"),
+	tables.people.Column("last_name"),
 }
-var posts = struct {
-	title  db.Column
-	userId db.Column
+var movies = struct {
+	id    db.Column
+	title db.Column
 }{
-	tables.posts.Column("title"),
-	tables.posts.Column("user_id"),
+	tables.movies.Column("id"),
+	tables.movies.Column("title"),
+}
+
+func crash(err error) {
+	if err != nil {
+		log.Panic(err)
+	}
 }
 
 func main() {
@@ -34,18 +45,14 @@ func main() {
 	server.Start()
 	defer server.Stop()
 	dbName := "movies"
-	server.CreateDB(dbName)
+	crash(server.CreateDB(dbName))
+	crash(exec.Command("psql", "-d", dbName, "-f", "schema.sql").Run())
 
-	connection, _ := server.Connect(dbName)
-	db.DB = connection
+	connection, err := server.Connect(dbName)
+	crash(err)
 
-	rows := db.Select(posts.title, users.name).From(tables.posts).Join(tables.users, users.id, posts.userId).Execute()
+	rows := db.Select(movies.title).From(tables.movies).Execute(connection)
 	for _, row := range rows {
-		Div(Class("foo"))(
-			P()(
-				Text(row.String(posts.title)),
-				Text(row.String(users.name)),
-			),
-		)
+		log.Print(row.String(movies.title))
 	}
 }
