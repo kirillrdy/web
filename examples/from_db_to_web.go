@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 
 	"github.com/kirillrdy/web/db"
 	"github.com/kirillrdy/web/postgresql"
@@ -41,7 +42,8 @@ func crash(err error) {
 }
 
 func main() {
-	dbDir := "example_db"
+	homedir, err := os.UserHomeDir()
+	dbDir := path.Join(homedir, "example_db")
 	dbName := "movies"
 	server := postgresql.Server{DBDir: dbDir}
 	if _, err := os.Stat(dbDir); os.IsNotExist(err) == true {
@@ -61,8 +63,8 @@ func main() {
 
 	db.Insert().Into(tables.movies, movies.title).Values("Shawshank Redeption").Execute(connection)
 
-	rows := db.Select(movies.title).From(tables.movies).Execute(connection)
+	rows := db.Select(movies.id, movies.title).From(tables.movies).Execute(connection)
 	for _, row := range rows {
-		log.Print(row.String(movies.title))
+		log.Printf("%s %s", row.String(movies.id), row.String(movies.title))
 	}
 }
