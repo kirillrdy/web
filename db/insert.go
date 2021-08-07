@@ -55,5 +55,4 @@ func (insert InsertQuery) Execute(db *sql.DB) (int64, error) {
 		return 0, err
 	}
 	return result.LastInsertId()
-
 }
