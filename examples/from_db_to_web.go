@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"time"
 
 	"github.com/kirillrdy/web/admin"
 	"github.com/kirillrdy/web/db"
@@ -30,11 +31,15 @@ var people = struct {
 	tables.people.Column("last_name"),
 }
 var movies = struct {
-	id    db.Column
-	title db.Column
+	id         db.Column
+	title      db.Column
+	year       db.Column
+	created_at db.Column
 }{
 	tables.movies.Column("id"),
 	tables.movies.Column("title"),
+	tables.movies.Column("year"),
+	tables.movies.Column("created_at"),
 }
 
 func crash(err error) {
@@ -49,8 +54,9 @@ func main() {
 	dbName := "movies"
 	server := postgresql.Server{DBDir: dbDir}
 	if _, err := os.Stat(dbDir); os.IsNotExist(err) == true {
-		server.InitDB()
-		server.Start()
+		crash(server.InitDB())
+		crash(server.Start())
+		time.Sleep(time.Second)
 
 		crash(server.CreateDB(dbName))
 		crash(exec.Command("psql", "-d", dbName, "-f", "schema.sql").Run())
@@ -63,7 +69,7 @@ func main() {
 	connection, err := server.Connect(dbName)
 	crash(err)
 
-	if false {
+	if true {
 		for i := 0; i < 1000; i++ {
 			db.Insert().Into(tables.movies, movies.title).Values("Shawshank Redeption").Execute(connection)
 		}
