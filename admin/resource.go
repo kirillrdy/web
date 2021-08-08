@@ -114,8 +114,12 @@ func makeEditHandler(connection *sql.DB, table db.Table, columns []db.Column) ht
 			//TODO handle error
 			updateQuery := db.Update(table)
 			for _, column := range columns {
+				if column.PrimaryKey() {
+					continue
+				}
 				updateQuery = updateQuery.Set(column, request.Form[column.FullName()][0])
 			}
+			updateQuery.Where(table.PrimaryKey().Eq(id))
 			// TODO check errors
 			updateQuery.Execute(connection)
 			http.Redirect(response, request, PathFor(table), 302)
@@ -126,7 +130,7 @@ func makeEditHandler(connection *sql.DB, table db.Table, columns []db.Column) ht
 			//Type := html.Type
 			var fields []html.Node
 			for _, column := range columns {
-				if column == table.PrimaryKey() {
+				if column.PrimaryKey() {
 					continue
 				}
 				input := Div()(
