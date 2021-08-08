@@ -121,12 +121,18 @@ func makeEditHandler(connection *sql.DB, table db.Table, columns []db.Column) ht
 			http.Redirect(response, request, PathFor(table), 302)
 		} else {
 
-			Form, Input := html.Form, html.Input
-			Value, Name, Type, Action, Method := html.Value, html.Name, html.Type, html.Action, html.Method
+			Form, Input, Label, Text := html.Form, html.Input, html.Label, html.Text
+			Div, Value, Name, Type, Action, Method := html.Div, html.Value, html.Name, html.Type, html.Action, html.Method
 			//Type := html.Type
 			var fields []html.Node
 			for _, column := range columns {
-				input := Input(Value(row.String(column)), Name(column.FullName()))()
+				if column == table.PrimaryKey() {
+					continue
+				}
+				input := Div()(
+					Label()(Text(column.Name)),
+					Input(Value(row.String(column)), Name(column.FullName()))(),
+				)
 				fields = append(fields, input)
 			}
 			fields = append(fields, Input(Type("submit"))())
