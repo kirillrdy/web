@@ -19,9 +19,9 @@ func TestIf(t *testing.T) {
 }
 
 func generateDiv(condition bool) string {
-	return Div().Children(
+	return Div()(
 		If(condition).Then(
-			Span().Text("Hello"),
+			Span()(Text("Hello")),
 		).Nodes()...,
 	).String()
 }
