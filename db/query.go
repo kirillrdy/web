@@ -63,7 +63,7 @@ func check(err error) {
 func (query Query) ExecuteOne(db *sql.DB) (Row, error) {
 	rows := query.Limit(1).Execute(db)
 	if len(rows) == 0 {
-		//TODO better errors and use conctant errors
+		//TODO better errors and use constant errors
 		return Row{}, fmt.Errorf("didnt find anything")
 	}
 	return rows[0], nil
