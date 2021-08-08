@@ -119,7 +119,7 @@ func makeEditHandler(connection *sql.DB, table db.Table, columns []db.Column) ht
 				}
 				updateQuery = updateQuery.Set(column, request.Form[column.FullName()][0])
 			}
-			updateQuery.Where(table.PrimaryKey().Eq(id))
+			updateQuery = updateQuery.Where(table.PrimaryKey().Eq(id))
 			// TODO check errors
 			updateQuery.Execute(connection)
 			http.Redirect(response, request, PathFor(table), 302)
