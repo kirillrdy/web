@@ -6,6 +6,18 @@ import (
 )
 
 type Table string
+
+var columns = make(map[Table][]Column)
+
+func (table Table) Columns() []Column {
+	return columns[table]
+}
+
+func (table Table) PrimaryKey() Column {
+	//TODO for now hardcoded
+	return Column{Name: "id", Table: table}
+}
+
 type Column struct {
 	Table Table
 	Name  string
@@ -20,7 +32,9 @@ func (column Column) FullName() string {
 }
 
 func (table Table) Column(name string) Column {
-	return Column{Name: name, Table: table}
+	column := Column{Name: name, Table: table}
+	columns[table] = append(columns[table], column)
+	return column
 }
 
 func (column Column) Eq(value interface{}) WhereCondition {
