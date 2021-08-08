@@ -29,6 +29,10 @@ func page(title string, content html.Node) html.Node {
         a {
           margin-right: 7px;
         }
+        label {
+          display: inline-block;
+          width: 100px;
+        }
       `)),
 		),
 		Body()(
