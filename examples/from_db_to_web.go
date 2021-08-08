@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path"
+	"syscall"
 	"time"
 
 	"github.com/kirillrdy/web/admin"
@@ -65,6 +67,11 @@ func main() {
 
 	server.Start()
 	defer server.Stop()
+	go func() {
+		ch := make(chan os.Signal, 10)
+		signal.Notify(ch, syscall.SIGTERM)
+		<-ch
+	}()
 
 	connection, err := server.Connect(dbName)
 	crash(err)
