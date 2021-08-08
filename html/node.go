@@ -13,11 +13,8 @@ type Node struct {
 	text       string
 }
 
-//TODO pass buffer for even faster writing
 func (node Node) attributesAsString(result *strings.Builder) {
-	//TODO test this theory
 	for i := range node.Attributes {
-		//Note this is done for performance
 		result.WriteString(" ")
 		result.WriteString(node.Attributes[i].Name)
 		result.WriteString("=\"")
@@ -26,46 +23,61 @@ func (node Node) attributesAsString(result *strings.Builder) {
 	}
 }
 
+func (node Node) attributesToWriter(writer io.Writer) (int, error) {
+	for i := range node.Attributes {
+		// TODO is single Write call faster with fmt.Sprintf ???
+		//TODO return value of WriteString
+		io.WriteString(writer, " ")
+		io.WriteString(writer, node.Attributes[i].Name)
+		io.WriteString(writer, "=\"")
+		io.WriteString(writer, node.Attributes[i].Value)
+		io.WriteString(writer, "\"")
+	}
+	return 0, nil
+}
+
 func (node Node) WriteTo(writer io.Writer) (int64, error) {
-	written, err := io.WriteString(writer, node.String())
-	return int64(written), err
+	n, err := node.writeToWriter(writer)
+	return int64(n), err
 }
 
 func (node Node) String() string {
 	var builder strings.Builder
-	node.writeToBuffer(&builder)
+	// TODO replace with using the writeToWritier
+	node.writeToWriter(&builder)
 	return builder.String()
 }
 
-func (node Node) writeToBuffer(buffer *strings.Builder) {
+// TODO return values of io.WriteString
+func (node Node) writeToWriter(writer io.Writer) (int, error) {
 
 	//TODO peformance bench this 'if' vs 'if len' vs no if
 	if node.nodeType == "html" {
-		buffer.WriteString("<!DOCTYPE html>")
+		io.WriteString(writer, "<!DOCTYPE html>")
 	}
 
 	if node.nodeType == "" {
-		buffer.WriteString(node.text)
-		return
+		return io.WriteString(writer, node.text)
 	}
 
-	buffer.WriteString("<")
-	buffer.WriteString(node.nodeType)
-	node.attributesAsString(buffer)
-	buffer.WriteString(">")
+	io.WriteString(writer, "<")
+	io.WriteString(writer, node.nodeType)
+	node.attributesToWriter(writer)
+	io.WriteString(writer, ">")
 
 	if len(node.children) > 0 {
 		for i := range node.children {
-			node.children[i].writeToBuffer(buffer)
+			node.children[i].writeToWriter(writer)
 		}
 	} else {
-		buffer.WriteString(node.text)
+		io.WriteString(writer, node.text)
 	}
 
-	buffer.WriteString("</")
-	buffer.WriteString(node.nodeType)
-	buffer.WriteString(">")
+	io.WriteString(writer, "</")
+	io.WriteString(writer, node.nodeType)
+	io.WriteString(writer, ">")
 
+	return 0, nil
 }
 
 func Text(text string) Node {
