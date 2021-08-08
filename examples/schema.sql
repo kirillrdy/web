@@ -1,4 +1,6 @@
 CREATE TABLE movies (
   id serial,
-  title text
+  title text,
+  year int,
+  created_at timestamp DEFAULT now()
 );
