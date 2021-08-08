@@ -2,10 +2,12 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path"
 
+	"github.com/kirillrdy/web/admin"
 	"github.com/kirillrdy/web/db"
 	"github.com/kirillrdy/web/postgresql"
 	_ "github.com/lib/pq"
@@ -61,10 +63,14 @@ func main() {
 	connection, err := server.Connect(dbName)
 	crash(err)
 
-	db.Insert().Into(tables.movies, movies.title).Values("Shawshank Redeption").Execute(connection)
-
-	rows := db.Select(movies.id, movies.title).From(tables.movies).Execute(connection)
-	for _, row := range rows {
-		log.Printf("%s %s", row.String(movies.id), row.String(movies.title))
+	if false {
+		for i := 0; i < 1000; i++ {
+			db.Insert().Into(tables.movies, movies.title).Values("Shawshank Redeption").Execute(connection)
+		}
 	}
+
+	movies := admin.Resource{Table: tables.movies}
+
+	admin.AddResource(connection, movies)
+	http.ListenAndServe(":3000", nil)
 }
