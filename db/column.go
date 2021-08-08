@@ -23,6 +23,10 @@ type Column struct {
 	Name  string
 }
 
+func (column Column) PrimaryKey() bool {
+	return column.Name == "id"
+}
+
 func (column Column) FullName() string {
 	//TODO for now hack here is easier
 	if strings.HasPrefix(column.Name, "st_astext") {
