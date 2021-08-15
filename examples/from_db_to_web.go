@@ -54,36 +54,35 @@ func main() {
 	homedir, err := os.UserHomeDir()
 	dbDir := path.Join(homedir, "example_db")
 	dbName := "movies"
-	server := postgresql.Server{DBDir: dbDir}
+	postgres := postgresql.Server{DBDir: dbDir}
 	if _, err := os.Stat(dbDir); os.IsNotExist(err) == true {
-		crash(server.InitDB())
-		crash(server.Start())
+		crash(postgres.InitDB())
+		crash(postgres.Start())
 		time.Sleep(time.Second)
 
-		crash(server.CreateDB(dbName))
+		crash(postgres.CreateDB(dbName))
 		crash(exec.Command("psql", "-d", dbName, "-f", "schema.sql").Run())
-		server.Stop()
+		postgres.Stop()
 	}
 
-	server.Start()
-	defer server.Stop()
-	go func() {
-		ch := make(chan os.Signal, 10)
-		signal.Notify(ch, syscall.SIGTERM)
-		<-ch
-	}()
+	postgres.Start()
+	defer postgres.Stop()
 
-	connection, err := server.Connect(dbName)
+	connection, err := postgres.Connect(dbName)
 	crash(err)
 
 	if true {
 		for i := 0; i < 1000; i++ {
-			db.Insert().Into(tables.movies, movies.title).Values("Shawshank Redeption").Execute(connection)
+			db.Insert().Into(tables.movies, movies.title, movies.year).Values("Shawshank Redeption", 1994).Execute(connection)
 		}
 	}
 
 	movies := admin.Resource{Table: tables.movies}
 
 	admin.AddResource(connection, movies)
-	http.ListenAndServe(":3000", nil)
+	go http.ListenAndServe(":3000", nil)
+
+	ch := make(chan os.Signal, 10)
+	signal.Notify(ch, syscall.SIGINT)
+	<-ch
 }
