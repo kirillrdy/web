@@ -23,6 +23,7 @@ mkShell {
     golangci-lint
     #glibcLocales
     minio
+    gopls
     go
     (postgresql.withPackages ( p : [ p.postgis ]))
 
