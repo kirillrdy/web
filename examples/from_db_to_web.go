@@ -52,20 +52,21 @@ func crash(err error) {
 
 func main() {
 	homedir, err := os.UserHomeDir()
+	crash(err)
 	dbDir := path.Join(homedir, "example_db")
 	dbName := "movies"
 	postgres := postgresql.Server{DBDir: dbDir}
-	if _, err := os.Stat(dbDir); os.IsNotExist(err) == true {
+	if _, err := os.Stat(dbDir); os.IsNotExist(err) {
 		crash(postgres.InitDB())
 		crash(postgres.Start())
 		time.Sleep(time.Second)
 
 		crash(postgres.CreateDB(dbName))
 		crash(exec.Command("psql", "-d", dbName, "-f", "schema.sql").Run())
-		postgres.Stop()
+		crash(postgres.Stop())
 	}
 
-	postgres.Start()
+	crash(postgres.Start())
 	defer postgres.Stop()
 
 	connection, err := postgres.Connect(dbName)
@@ -73,7 +74,8 @@ func main() {
 
 	if true {
 		for i := 0; i < 1000; i++ {
-			db.Insert().Into(tables.movies, movies.title, movies.year).Values("Shawshank Redeption", 1994).Execute(connection)
+			_, err := db.Insert().Into(tables.movies, movies.title, movies.year).Values("Shawshank Redeption", 1994).Execute(connection)
+			crash(err)
 		}
 	}
 
