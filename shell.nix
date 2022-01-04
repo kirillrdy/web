@@ -5,12 +5,12 @@ let
 
   pkgs = import archive {};
   pkgsWithOurPostgres = pkgs // {
-    postgresql_13 = pkgs.postgresql_13.overrideAttrs(
+    postgresql_14 = pkgs.postgresql_14.overrideAttrs(
       old: {patches = pkgs.lib.lists.init old.patches;}
     );
   };
 
-  postgresql = (import "${archive}/pkgs/servers/sql/postgresql/default.nix" pkgsWithOurPostgres).postgresql_13;
+  postgresql = (import "${archive}/pkgs/servers/sql/postgresql/default.nix" pkgsWithOurPostgres).postgresql_14;
 
 in
 with pkgs;
