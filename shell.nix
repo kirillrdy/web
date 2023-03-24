@@ -1,31 +1,22 @@
-{ }:
+{}:
 
 let
-  archive = <nixpkgs>;
+  lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+  nixpkgs = (fetchTarball
+    { url = "https://api.github.com/repos/nixos/nixpkgs/tarball/${lock.nodes.nixpkgs.locked.rev}"; sha256 = lock.nodes.nixpkgs.locked.narHash; });
 
-  pkgs = import archive {};
-  pkgsWithOurPostgres = pkgs // {
-    postgresql_14 = pkgs.postgresql_14.overrideAttrs(
-      old: {patches = pkgs.lib.lists.init old.patches;}
-    );
-  };
-
-  postgresql = (import "${archive}/pkgs/servers/sql/postgresql/default.nix" pkgsWithOurPostgres).postgresql_14;
+  pkgs = import nixpkgs { };
 
 in
-with pkgs;
-mkShell {
-
+with pkgs; mkShell {
   shellHook = ''
   '';
 
   buildInputs = [
     golangci-lint
-    #glibcLocales
     minio
     gopls
     go
-    (postgresql.withPackages ( p : [ p.postgis ]))
-
+    (postgresql.withPackages (p: [ p.postgis ]))
   ];
 }
