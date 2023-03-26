@@ -63,11 +63,63 @@ func createEffect(function func()) {
 	currectEffect = nil
 }
 
+type Person struct {
+	name string
+}
+
 var document = Document(js.Global().Get("document"))
 var body = Element(js.Value(document).Get("body"))
 
+func For[T any](parent Element, collection func() []T, renderer func(item T) Element) {
+	currectEffect = func() {
+	}
+	for _, item := range collection() {
+		parent.AppendChild(renderer(item))
+	}
+	currectEffect = nil
+}
+
 func main() {
 	getName, setName := createSignal("Kirill")
+
+	people, setPeople := createSignal([]*Person{
+		{name: "Kirill"},
+		{name: "Steve"},
+		{name: "Bob"},
+	})
+
+	selected, setSelected := createSignal(&Person{})
+
+	for _, person := range people() {
+		person := person
+		div := document.createElement("div")
+		div.SetInnerText(person.name)
+		createEffect(func() {
+			if selected() == person {
+				div.SetAttribute("style", "color: red")
+			} else {
+				div.SetAttribute("style", "")
+			}
+		})
+		div.AddEventListener("click", func() {
+			setSelected(person)
+		})
+		body.AppendChild(div)
+	}
+
+	For(body, people, func(person *Person) Element {
+		div := document.createElement("div")
+		div.SetInnerText(person.name)
+		createEffect(func() {
+			if selected() == person {
+				div.SetAttribute("style", "color: red")
+			} else {
+				div.SetAttribute("style", "")
+			}
+		})
+
+		return div
+	})
 
 	div := document.createElement("div")
 	createEffect(func() {
@@ -78,6 +130,8 @@ func main() {
 
 	div.AddEventListener("click", func() {
 		setName("Steve")
+		people := append(people(), &Person{"New person"})
+		setPeople(people)
 	})
 
 	<-make(chan bool)
