@@ -82,13 +82,13 @@ func For[T any](parent Element, collection func() []T, renderer func(item T) Ele
 func main() {
 	getName, setName := createSignal("Kirill")
 
-	people, setPeople := createSignal([]*Person{
+	people, setPeople := createSignal([]Person{
 		{name: "Kirill"},
 		{name: "Steve"},
 		{name: "Bob"},
 	})
 
-	selected, setSelected := createSignal(&Person{})
+	selected, setSelected := createSignal(Person{})
 
 	for _, person := range people() {
 		person := person
@@ -107,7 +107,7 @@ func main() {
 		body.AppendChild(div)
 	}
 
-	For(body, people, func(person *Person) Element {
+	For(body, people, func(person Person) Element {
 		div := document.createElement("div")
 		div.SetInnerText(person.name)
 		createEffect(func() {
