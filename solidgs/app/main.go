@@ -130,7 +130,7 @@ func main() {
 
 	div.AddEventListener("click", func() {
 		setName("Steve")
-		people := append(people(), &Person{"New person"})
+		people := append(people(), Person{"New person"})
 		setPeople(people)
 	})
 
