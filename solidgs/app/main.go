@@ -43,8 +43,8 @@ func createSignal[T any](defaultValue T) (func() T, func(T)) {
 
 // TODO panic when called outside effect
 func (signal *Signal[T]) Get() T {
-	if currectEffect != nil {
-		signal.notifies = append(signal.notifies, currectEffect)
+	if currentEffect != nil {
+		signal.notifies = append(signal.notifies, currentEffect)
 	}
 	return signal.storage
 }
@@ -55,12 +55,12 @@ func (signal *Signal[T]) Set(value T) {
 	}
 }
 
-var currectEffect func()
+var currentEffect func()
 
 func createEffect(function func()) {
-	currectEffect = function
+	currentEffect = function
 	function()
-	currectEffect = nil
+	currentEffect = nil
 }
 
 type Person struct {
@@ -71,12 +71,12 @@ var document = Document(js.Global().Get("document"))
 var body = Element(js.Value(document).Get("body"))
 
 func For[T any](parent Element, collection func() []T, renderer func(item T) Element) {
-	currectEffect = func() {
+	currentEffect = func() {
 	}
 	for _, item := range collection() {
 		parent.AppendChild(renderer(item))
 	}
-	currectEffect = nil
+	currentEffect = nil
 }
 
 func main() {
