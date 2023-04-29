@@ -70,13 +70,15 @@ type Person struct {
 var document = Document(js.Global().Get("document"))
 var body = Element(js.Value(document).Get("body"))
 
-func For[T any](parent Element, collection func() []T, renderer func(item T) Element) {
+func For[T any](collection func() []T, renderer func(item T) Element) Element {
+	parent := document.createElement("div")
 	currentEffect = func() {
 	}
 	for _, item := range collection() {
 		parent.AppendChild(renderer(item))
 	}
 	currentEffect = nil
+	return parent
 }
 
 func main() {
@@ -107,7 +109,7 @@ func main() {
 		body.AppendChild(div)
 	}
 
-	For(body, people, func(person Person) Element {
+	body.AppendChild(For(people, func(person Person) Element {
 		div := document.createElement("div")
 		div.SetInnerText(person.name)
 		createEffect(func() {
@@ -119,7 +121,7 @@ func main() {
 		})
 
 		return div
-	})
+	}))
 
 	div := document.createElement("div")
 	createEffect(func() {
