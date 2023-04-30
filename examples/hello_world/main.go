@@ -9,6 +9,7 @@ type Person struct {
 }
 
 func main() {
+	A, T, On := solidgo.A, solidgo.T, solidgo.On
 	createEffect := solidgo.CreateEffect
 	document := solidgo.Window.Document
 	body := document.Body
@@ -66,5 +67,9 @@ func main() {
 		setPeople(people)
 	})
 
+	body.AppendChild(
+		A("div")(On("click", func() { setName("Steve") }))(
+			T(func() string { return "Hello world " + getName() }),
+		))
 	<-make(chan bool)
 }
