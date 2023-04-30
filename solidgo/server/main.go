@@ -14,7 +14,7 @@ func main() {
 		http.ServeFile(response, request, "index.html")
 	})
 	http.HandleFunc("/app.wasm", func(response http.ResponseWriter, request *http.Request) {
-		command := exec.Command("go", "build", "-o", "app.wasm", "app/main.go")
+		command := exec.Command("go", "build", "-o", "app.wasm", "*.go")
 		os.Setenv("GOOS", "js")
 		os.Setenv("GOARCH", "wasm")
 		output, err := command.CombinedOutput()
@@ -34,5 +34,6 @@ func main() {
 		f := filepath.Join(strings.TrimSpace(string(out)), "misc", "wasm", "wasm_exec.js")
 		http.ServeFile(response, request, f)
 	})
+	log.Print("wasm server started")
 	http.ListenAndServe(":3000", nil)
 }
