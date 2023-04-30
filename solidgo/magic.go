@@ -31,10 +31,10 @@ func On(event string, callback func()) EventCallBack {
 func T(effect func() string) Element {
 	element := Window.Document.CreateTextNode("")
 	currentEffect = func() {
-		value := effect()
-		js.Value(element).Set("textContent", value)
+		js.Value(element).Set("textContent", effect())
 	}
 	currentEffect()
+	currentEffect = nil
 	return element
 }
 
