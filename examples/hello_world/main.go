@@ -1,100 +1,27 @@
 package main
 
 import (
-	"syscall/js"
+	"github.com/kirillrdy/web/solidgo"
 )
-
-type Document js.Value
-type Element js.Value
-
-func (document Document) createElement(name string) Element {
-	return Element(js.Value(document).Call("createElement", name))
-}
-
-func (element Element) SetAttribute(name, value string) {
-	js.Value(element).Call("setAttribute", name, value)
-}
-
-func (element Element) AppendChild(value Element) {
-	js.Value(element).Call("appendChild", js.Value(value))
-}
-
-func (element Element) SetInnerText(value string) {
-	js.Value(element).Set("innerText", value)
-}
-
-func (element Element) AddEventListener(name string, function func()) {
-	callback := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		function()
-		return nil
-	})
-	js.Value(element).Call("addEventListener", name, callback)
-}
-
-type Signal[T any] struct {
-	storage  T
-	notifies []func()
-}
-
-func createSignal[T any](defaultValue T) (func() T, func(T)) {
-	signal := Signal[T]{storage: defaultValue}
-	return signal.Get, signal.Set
-}
-
-// TODO panic when called outside effect
-func (signal *Signal[T]) Get() T {
-	if currentEffect != nil {
-		signal.notifies = append(signal.notifies, currentEffect)
-	}
-	return signal.storage
-}
-func (signal *Signal[T]) Set(value T) {
-	signal.storage = value
-	for _, function := range signal.notifies {
-		function()
-	}
-}
-
-var currentEffect func()
-
-func createEffect(function func()) {
-	currentEffect = function
-	function()
-	currentEffect = nil
-}
 
 type Person struct {
 	name string
 }
 
-var document = Document(js.Global().Get("document"))
-var body = Element(js.Value(document).Get("body"))
-
-func For[T any](collection func() []T, renderer func(item T) Element) Element {
-	parent := document.createElement("div")
-	currentEffect = func() {
-	}
-	for _, item := range collection() {
-		parent.AppendChild(renderer(item))
-	}
-	currentEffect = nil
-	return parent
-}
-
 func main() {
-	getName, setName := createSignal("Kirill")
+	getName, setName := solidgo.CreateSignal("Kirill")
 
-	people, setPeople := createSignal([]Person{
+	people, setPeople := solidgo.CreateSignal([]Person{
 		{name: "Kirill"},
 		{name: "Steve"},
 		{name: "Bob"},
 	})
 
-	selected, setSelected := createSignal(Person{})
+	selected, setSelected := solidgo.CreateSignal(Person{})
 
 	for _, person := range people() {
 		person := person
-		div := document.createElement("div")
+		div := solidgo.document.createElement("div")
 		div.SetInnerText(person.name)
 		createEffect(func() {
 			if selected() == person {
