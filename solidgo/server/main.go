@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -11,10 +12,25 @@ import (
 
 func main() {
 	http.HandleFunc("/", func(response http.ResponseWriter, request *http.Request) {
-		http.ServeFile(response, request, "index.html")
+		io.WriteString(response, `
+<!DOCTYPE html>
+<html>
+  <head>
+     <script src="/wasm_exec.js"></script>
+     <script>
+         const go = new Go();
+         WebAssembly.instantiateStreaming(fetch("app.wasm"), go.importObject).then((result) => {
+             go.run(result.instance);
+         });
+     </script>
+  </head>
+  <body>
+  </body>
+</html>
+    `)
 	})
 	http.HandleFunc("/app.wasm", func(response http.ResponseWriter, request *http.Request) {
-		command := exec.Command("go", "build", "-o", "app.wasm", "*.go")
+		command := exec.Command("go", "build", "-o", "app.wasm", "main.go")
 		os.Setenv("GOOS", "js")
 		os.Setenv("GOARCH", "wasm")
 		output, err := command.CombinedOutput()

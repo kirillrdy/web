@@ -2,14 +2,26 @@ package solidgo
 
 import "syscall/js"
 
-type Document js.Value
+type Document struct {
+	Js   js.Value
+	Body Element
+}
 type Element js.Value
 
-var document = Document(js.Global().Get("document"))
-var body = Element(js.Value(document).Get("body"))
+var Window = struct {
+	Document Document
+	Body     Element
+}{
+	Document: Document{Js: js.Global().Get("document"),
+		Body: Element(js.Global().Get("document").Get("body")),
+	}}
 
-func (document Document) createElement(name string) Element {
-	return Element(js.Value(document).Call("createElement", name))
+func (document Document) CreateElement(name string) Element {
+	return Element(document.Js.Call("createElement", name))
+}
+
+func (document Document) CreateTextNode(content string) Element {
+	return Element(document.Js.Call("createTextNode", content))
 }
 
 func (element Element) SetAttribute(name, value string) {

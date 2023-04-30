@@ -1,7 +1,7 @@
 package solidgo
 
 func For[T any](collection func() []T, renderer func(item T) Element) Element {
-	parent := document.createElement("div")
+	parent := Window.Document.CreateElement("div")
 	currentEffect = func() {
 	}
 	for _, item := range collection() {

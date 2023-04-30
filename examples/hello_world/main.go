@@ -9,6 +9,9 @@ type Person struct {
 }
 
 func main() {
+	createEffect := solidgo.CreateEffect
+	document := solidgo.Window.Document
+	body := document.Body
 	getName, setName := solidgo.CreateSignal("Kirill")
 
 	people, setPeople := solidgo.CreateSignal([]Person{
@@ -21,9 +24,9 @@ func main() {
 
 	for _, person := range people() {
 		person := person
-		div := solidgo.document.createElement("div")
+		div := solidgo.Window.Document.CreateElement("div")
 		div.SetInnerText(person.name)
-		createEffect(func() {
+		solidgo.CreateEffect(func() {
 			if selected() == person {
 				div.SetAttribute("style", "color: red")
 			} else {
@@ -33,11 +36,11 @@ func main() {
 		div.AddEventListener("click", func() {
 			setSelected(person)
 		})
-		body.AppendChild(div)
+		solidgo.Window.Document.Body.AppendChild(div)
 	}
 
-	body.AppendChild(For(people, func(person Person) Element {
-		div := document.createElement("div")
+	body.AppendChild(solidgo.For(people, func(person Person) solidgo.Element {
+		div := document.CreateElement("div")
 		div.SetInnerText(person.name)
 		createEffect(func() {
 			if selected() == person {
@@ -50,7 +53,7 @@ func main() {
 		return div
 	}))
 
-	div := document.createElement("div")
+	div := document.CreateElement("div")
 	createEffect(func() {
 		div.SetInnerText("hello from " + getName())
 	})
