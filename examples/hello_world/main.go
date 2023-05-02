@@ -19,6 +19,10 @@ func main() {
 	})
 
 	selected, setSelected := solidgo.CreateSignal(Person{})
+	addPerson := func() {
+		people := append(people(), Person{name: "new guys"})
+		setPeople(people)
+	}
 
 	A("div")()(
 		A("div")()(
