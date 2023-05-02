@@ -52,8 +52,8 @@ func At(name string, effect func() string) Attribute {
 }
 
 func A(name string) func(...ApplyToElement) func(...Appendable) Element {
-	element := Window.Document.CreateElement(name)
-	attributesFunction := func(attributes ...ApplyToElement) func(...Appendable) Element {
+	return func(attributes ...ApplyToElement) func(...Appendable) Element {
+		element := Window.Document.CreateElement(name)
 		for _, attribute := range attributes {
 			attribute.Apply(element)
 		}
@@ -64,5 +64,4 @@ func A(name string) func(...ApplyToElement) func(...Appendable) Element {
 			return element
 		}
 	}
-	return attributesFunction
 }
