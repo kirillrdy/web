@@ -9,7 +9,7 @@ type Person struct {
 }
 
 func main() {
-	A, At, T, On := solidgo.A, solidgo.At, solidgo.T, solidgo.On
+	A, T, At, On := solidgo.A, solidgo.T, solidgo.At, solidgo.On
 	document := solidgo.Window.Document
 	body := document.Body
 
