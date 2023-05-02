@@ -21,7 +21,16 @@ func (event EventCallBack) Apply(element Element) {
 }
 
 func (attribute Attribute) Apply(element Element) {
-	element.SetAttribute(attribute.Name, attribute.Effect())
+	//TODO replace this with automatic wrapper
+	// eg runEffect(func(){
+	// })
+	// where runEffect will also execute effect
+	currentEffect = func() {
+		element.SetAttribute(attribute.Name, attribute.Effect())
+	}
+	currentEffect()
+
+	currentEffect = nil
 }
 
 func On(event string, callback func()) EventCallBack {
