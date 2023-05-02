@@ -32,6 +32,10 @@ func (element Element) AppendChild(value Element) {
 	js.Value(element).Call("appendChild", js.Value(value))
 }
 
+func (element Element) AppendTo(parent Element) {
+	parent.AppendChild(element)
+}
+
 func (element Element) SetInnerText(value string) {
 	js.Value(element).Set("innerText", value)
 }

@@ -40,20 +40,6 @@ func main() {
 		solidgo.Window.Document.Body.AppendChild(div)
 	}
 
-	body.AppendChild(solidgo.For(people, func(person Person) solidgo.Element {
-		div := document.CreateElement("div")
-		div.SetInnerText(person.name)
-		createEffect(func() {
-			if selected() == person {
-				div.SetAttribute("style", "color: red")
-			} else {
-				div.SetAttribute("style", "")
-			}
-		})
-
-		return div
-	}))
-
 	div := document.CreateElement("div")
 	createEffect(func() {
 		div.SetInnerText("hello from " + getName())
@@ -67,9 +53,21 @@ func main() {
 		setPeople(people)
 	})
 
-	body.AppendChild(
+	A("div")()(
+		solidgo.ForStruct[Person]{Collection: people, Render: func(person Person) solidgo.Element {
+			div := document.CreateElement("div")
+			div.SetInnerText(person.name)
+			createEffect(func() {
+				if selected() == person {
+					div.SetAttribute("style", "color: red")
+				} else {
+					div.SetAttribute("style", "")
+				}
+			})
+			return div
+		}},
 		A("div")(On("click", func() { setName("Steve") }))(
 			T(func() string { return "Hello world " + getName() }),
-		))
+		)).AppendTo(body)
 	<-make(chan bool)
 }

@@ -42,15 +42,15 @@ func At(name string, effect func() string) Attribute {
 	return Attribute{Name: name, Effect: effect}
 }
 
-func A(name string) func(...ApplyToElement) func(...Element) Element {
+func A(name string) func(...ApplyToElement) func(...Appendable) Element {
 	element := Window.Document.CreateElement(name)
-	attributesFunction := func(attributes ...ApplyToElement) func(...Element) Element {
+	attributesFunction := func(attributes ...ApplyToElement) func(...Appendable) Element {
 		for _, attribute := range attributes {
 			attribute.Apply(element)
 		}
-		return func(children ...Element) Element {
+		return func(children ...Appendable) Element {
 			for _, child := range children {
-				element.AppendChild(child)
+				child.AppendTo(element)
 			}
 			return element
 		}
