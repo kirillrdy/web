@@ -34,10 +34,9 @@ func main() {
 					return ""
 				}), On("click", func() { setSelected(person) }))(T(func() string { return person.name }))
 			}}),
-		A("button")(On("click", func() {
-			people := append(people(), Person{name: "new guys"})
-			setPeople(people)
-		}))(T(func() string { return "Click Me" })),
+		A("button")(On("click", addPerson))(
+			solidgo.Window.Document.CreateTextNode("Click Me"),
+		),
 	).AppendTo(body)
 	<-make(chan bool)
 }
