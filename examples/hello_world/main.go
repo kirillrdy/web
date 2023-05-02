@@ -10,8 +10,7 @@ type Person struct {
 
 func main() {
 	A, T, At, On := solidgo.A, solidgo.T, solidgo.At, solidgo.On
-	document := solidgo.Window.Document
-	body := document.Body
+	body := solidgo.Window.Document.Body
 
 	people, setPeople := solidgo.CreateSignal([]Person{
 		{name: "Kirill"},
