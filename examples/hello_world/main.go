@@ -9,11 +9,9 @@ type Person struct {
 }
 
 func main() {
-	A, T, On := solidgo.A, solidgo.T, solidgo.On
-	createEffect := solidgo.CreateEffect
+	A, At, T, On := solidgo.A, solidgo.At, solidgo.T, solidgo.On
 	document := solidgo.Window.Document
 	body := document.Body
-	getName, setName := solidgo.CreateSignal("Kirill")
 
 	people, setPeople := solidgo.CreateSignal([]Person{
 		{name: "Kirill"},
@@ -23,51 +21,20 @@ func main() {
 
 	selected, setSelected := solidgo.CreateSignal(Person{})
 
-	for _, person := range people() {
-		person := person
-		div := solidgo.Window.Document.CreateElement("div")
-		div.SetInnerText(person.name)
-		solidgo.CreateEffect(func() {
-			if selected() == person {
-				div.SetAttribute("style", "color: red")
-			} else {
-				div.SetAttribute("style", "")
-			}
-		})
-		div.AddEventListener("click", func() {
-			setSelected(person)
-		})
-		solidgo.Window.Document.Body.AppendChild(div)
-	}
-
-	div := document.CreateElement("div")
-	createEffect(func() {
-		div.SetInnerText("hello from " + getName())
-	})
-
-	body.AppendChild(div)
-
-	div.AddEventListener("click", func() {
-		setName("Steve")
-		people := append(people(), Person{"New person"})
-		setPeople(people)
-	})
-
 	A("div")()(
-		solidgo.ForStruct[Person]{Collection: people, Render: func(person Person) solidgo.Element {
-			div := document.CreateElement("div")
-			div.SetInnerText(person.name)
-			createEffect(func() {
-				if selected() == person {
-					div.SetAttribute("style", "color: red")
-				} else {
-					div.SetAttribute("style", "")
-				}
-			})
-			return div
-		}},
-		A("div")(On("click", func() { setName("Steve") }))(
-			T(func() string { return "Hello world " + getName() }),
-		)).AppendTo(body)
+		A("div")()(
+			solidgo.ForStruct[Person]{Collection: people, Render: func(person Person) solidgo.Element {
+				return A("div")(At("style", func() string {
+					if selected() == person {
+						return "color: red"
+					}
+					return ""
+				}), On("click", func() { setSelected(person) }))(T(func() string { return person.name }))
+			}}),
+		A("button")(On("click", func() {
+			people := append(people(), Person{name: "new guys"})
+			setPeople(people)
+		}))(T(func() string { return "Click Me" })),
+	).AppendTo(body)
 	<-make(chan bool)
 }

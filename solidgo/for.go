@@ -1,6 +1,9 @@
 package solidgo
 
-import "reflect"
+import (
+	"reflect"
+	"syscall/js"
+)
 
 func For(collection func() []interface{}, renderer func(index int) Element) Element {
 	parent := Window.Document.CreateElement("div")
@@ -19,17 +22,27 @@ type Appendable interface {
 	AppendTo(Element)
 }
 
-type ForStruct[T any] struct {
+type ForStruct[T comparable] struct {
 	Collection func() []T
 	Render     func(T) Element
 }
 
 func (forR ForStruct[T]) AppendTo(parent Element) {
+	var previous []Element
 	currentEffect = func() {
+		for _, item := range previous {
+			// replaced Remove with binding
+			js.Value(item).Call("remove")
+		}
+		previous = nil
+		for _, item := range forR.Collection() {
+			element := forR.Render(item)
+			previous = append(previous, element)
+			parent.AppendChild(element)
+		}
 	}
-	for _, item := range forR.Collection() {
-		parent.AppendChild(forR.Render(item))
-	}
+	currentEffect()
+
 	currentEffect = nil
 
 }
