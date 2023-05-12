@@ -5,7 +5,11 @@ import (
 	"syscall/js"
 )
 
-func For(collection func() []interface{}, renderer func(index int) Element) Element {
+func For[T comparable](collection func() []T, renderer func(T) Element) ForStruct[T] {
+	return ForStruct[T]{Collection: collection, Render: renderer}
+}
+
+func ForI(collection func() []interface{}, renderer func(index int) Element) Element {
 	parent := Window.Document.CreateElement("div")
 	currentEffect = func() {
 		//TODO for now just rebuild whole thing

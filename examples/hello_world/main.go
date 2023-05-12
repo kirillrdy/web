@@ -26,14 +26,15 @@ func main() {
 
 	A("div")()(
 		A("div")()(
-			solidgo.ForStruct[Person]{Collection: people, Render: func(person Person) solidgo.Element {
+			solidgo.For(people, func(person Person) solidgo.Element {
 				return A("div")(At("style", func() string {
 					if selected() == person {
 						return "color: red"
 					}
 					return ""
 				}), On("click", func() { setSelected(person) }))(T(func() string { return person.name }))
-			}}),
+			}),
+		),
 		A("button")(On("click", addPerson))(
 			solidgo.Window.Document.CreateTextNode("Click Me"),
 		),
