@@ -19,24 +19,29 @@ func main() {
 	})
 
 	selected, setSelected := solidgo.CreateSignal(Person{})
+
 	addPerson := func() {
 		people := append(people(), Person{name: "new guys"})
 		setPeople(people)
 	}
+	personRender := func(person Person) solidgo.Element {
+		style := func() string {
+			if selected() == person {
+				return "color: red"
+			}
+			return ""
+		}
+		return A("div")(At("style", style), On("click", func() { setSelected(person) }))(
+			T(person.name),
+		)
+	}
 
 	A("div")()(
 		A("div")()(
-			solidgo.For(people, func(person Person) solidgo.Element {
-				return A("div")(At("style", func() string {
-					if selected() == person {
-						return "color: red"
-					}
-					return ""
-				}), On("click", func() { setSelected(person) }))(T(func() string { return person.name }))
-			}),
+			solidgo.For(people, personRender),
 		),
 		A("button")(On("click", addPerson))(
-			solidgo.Window.Document.CreateTextNode("Click Me"),
+			T("Click Me"),
 		),
 	).AppendTo(body)
 	<-make(chan bool)
