@@ -37,7 +37,12 @@ func On(event string, callback func()) EventCallBack {
 	return EventCallBack{Name: event, Callback: callback}
 }
 
-func T(effect func() string) Element {
+func T(text string) Element {
+	return Window.Document.CreateTextNode(text)
+}
+
+// Text Reactive
+func Tr(effect func() string) Element {
 	element := Window.Document.CreateTextNode("")
 	currentEffect = func() {
 		js.Value(element).Set("textContent", effect())
