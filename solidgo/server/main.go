@@ -12,7 +12,7 @@ import (
 
 func main() {
 	http.HandleFunc("/", func(response http.ResponseWriter, request *http.Request) {
-		io.WriteString(response, `
+		_, err := io.WriteString(response, `
 <!DOCTYPE html>
 <html>
   <head>
@@ -28,6 +28,9 @@ func main() {
   </body>
 </html>
     `)
+		if err != nil {
+			panic(err)
+		}
 	})
 	http.HandleFunc("/app.wasm", func(response http.ResponseWriter, request *http.Request) {
 		command := exec.Command("go", "build", "-o", "app.wasm", "main.go")
