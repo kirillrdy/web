@@ -5,10 +5,6 @@ let
   pkgs = import nixpkgs { };
 in
 with pkgs; mkShell {
-  shellHook = ''
-    alias neovide="GOOS=js GOARCH=wasm neovide"
-  '';
-
   buildInputs = [
     golangci-lint
     minio
