@@ -12,19 +12,20 @@ func main() {
 	A, T, At, On := solidgo.A, solidgo.T, solidgo.At, solidgo.On
 	body := solidgo.Window.Document.Body
 
-	people, setPeople := solidgo.CreateSignal([]Person{
-		{name: "Kirill"},
-		{name: "Steve"},
-		{name: "Bob"},
-	})
+	var initialPeople []*Person
+	for i := 0; i < 10000; i++ {
+		initialPeople = append(initialPeople, &Person{name: "Kirill"})
+	}
 
-	selected, setSelected := solidgo.CreateSignal(Person{})
+	people, setPeople := solidgo.CreateSignal(initialPeople)
+
+	selected, setSelected := solidgo.CreateSignal(&Person{})
 
 	addPerson := func() {
-		people := append(people(), Person{name: "new guys"})
+		people := append(people(), &Person{name: "new guys"})
 		setPeople(people)
 	}
-	personRender := func(person Person) solidgo.Element {
+	personRender := func(person *Person) solidgo.Element {
 		style := func() string {
 			if selected() == person {
 				return "color: red"
