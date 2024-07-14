@@ -10,21 +10,16 @@ type Person struct {
 
 func main() {
 	A, T, At, On := solidgo.A, solidgo.T, solidgo.At, solidgo.On
-	body := solidgo.Window.Document.Body
 
 	var initialPeople []*Person
 	for i := 0; i < 10000; i++ {
 		initialPeople = append(initialPeople, &Person{name: "Kirill"})
 	}
 
-	people, setPeople := solidgo.CreateSignal(initialPeople)
+	people, _ := solidgo.CreateSignal(initialPeople)
 
 	selected, setSelected := solidgo.CreateSignal(&Person{})
 
-	addPerson := func() {
-		people := append(people(), &Person{name: "new guys"})
-		setPeople(people)
-	}
 	personRender := func(person *Person) solidgo.Element {
 		style := func() string {
 			if selected() == person {
@@ -38,12 +33,7 @@ func main() {
 	}
 
 	A("div")()(
-		A("div")()(
-			solidgo.For(people, personRender),
-		),
-		A("button")(On("click", addPerson))(
-			T("Click Me"),
-		),
-	).AppendTo(body)
+		solidgo.For(people, personRender),
+	).AppendTo(solidgo.Window.Document.Body)
 	<-make(chan bool)
 }
