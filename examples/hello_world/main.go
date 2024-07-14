@@ -25,7 +25,7 @@ func main() {
 			if selected() == person {
 				return "color: red"
 			}
-			return ""
+			return "inherit"
 		}
 		return A("div")(At("style", style), On("click", func() { setSelected(person) }))(
 			T(person.name),
