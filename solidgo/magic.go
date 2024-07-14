@@ -25,8 +25,13 @@ func (attribute Attribute) Apply(element Element) {
 	// eg runEffect(func(){
 	// })
 	// where runEffect will also execute effect
+	var oldValue string
 	currentEffect = func() {
-		element.SetAttribute(attribute.Name, attribute.Effect())
+		value := attribute.Effect()
+		if value != oldValue {
+			element.SetAttribute(attribute.Name, value)
+			oldValue = value
+		}
 	}
 	currentEffect()
 
